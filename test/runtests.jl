@@ -803,3 +803,20 @@ end
     @test all(isapprox.(J1, Jfd, atol=1e-9))
 
 end
+
+@testset "thru-optimization" begin
+    function solveopt()
+        nothing
+    end
+
+    function residualopt()
+        nothing
+    end
+
+    function diffThru()
+        X = [1.0,2.0,3.0]
+        Y = implicit(solveopt,residualopt,X)
+        nothing
+    end
+    
+end
