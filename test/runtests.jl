@@ -1116,3 +1116,20 @@ end
     @test all(isapprox.(xbar, J' * fbar, rtol=1e-15))
 
 end
+
+@testset "thru-optimization" begin
+    function solveopt()
+        nothing
+    end
+
+    function residualopt()
+        nothing
+    end
+
+    function diffThru()
+        X = [1.0,2.0,3.0]
+        Y = implicit(solveopt,residualopt,X)
+        nothing
+    end
+    
+end
