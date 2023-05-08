@@ -8,7 +8,7 @@ using LinearAlgebra: factorize, ldiv!, diag
 # main function
 export implicit, explicit_unsteady, implicit_unsteady, implicit_opt,  implicit_linear, apply_factorization, implicit_eigval, provide_rule
 
-println("HITHERE! YOU're USING A LOCAL VERSION ON BRANCH  lagrange")
+println("HITHERE! YOU ARE USING A LOCAL VERSION ON BRANCH  lagrange")
 # ---------------------------------------------------------------------------
 
 # ------- Unpack/Pack ForwardDiff Dual ------
@@ -506,7 +506,7 @@ ReverseDiff.@grad_from_chainrules implicit_unsteady(solve, residual, x::Abstract
 
 
 # ---------- differentiable optimization problems----------------
-implicit_opt(solve, lagrangian, P, opts,NDV;method="Hessian") = solve(P, opts)
+implicit_opt(solve, objcon, P, opts, NDV ;method="Hessian") = solve(P, opts)
 
 """
     implicit_opt(solve, objcon, P, opts,NDV)
@@ -517,7 +517,7 @@ Make implicit function AD compatible (specifically with ForwardDiff and ReverseD
 - `solve::function`: xL = solve(P, opts). Solve optimization problem returning state variables x and L, for input variables P, and fixed optional parameters opts.
 - `objcon::vector{function}`: 
 - `P::vector{float}`: evaluation point; constant parameters given to the optimization problem
-- `opts::tuple`: optional fixed parameters to solve. default is empty tuple.
+- `opts::tuple`: optional fixed parameters to solve. default is empty tuple. 
 - `NDV::int`: number of design variables, to distinguish output state from intermediate lagrange multipliers
 """
 
@@ -568,7 +568,7 @@ function implicit_opt(solve, objcon,P::AbstractVector{<:ForwardDiff.Dual{T}}, op
         
         # reconstruct output vector xLv to include only relevant pieces
         xLvR = xLv[relevant]
-        residual=residual_constructor(relevant,objcon,xLv,Pv,NDV)
+        residual=construct_residuals(relevant,objcon,xLv,Pv,NDV)
         
         # solve for Jacobian-vector product
         b = jvp(residual, xLvR, P, opts)
@@ -595,11 +595,11 @@ function construct_lagrangian(objcon,xLv,Pv,NDV)
         end
         return Lagr
     end
-    
+
     return Lagrangian
     
 end
-function residual_constructor(REL,objcon,xLv,Pv,NDV)
+function construct_residuals(REL,objcon,xLv,Pv,NDV)
     M = length(xLv)
     N = length(Pv)
     
@@ -621,6 +621,7 @@ function residual_constructor(REL,objcon,xLv,Pv,NDV)
         end
         
         G = hcat(G...) # All the gradients 
+        
         R = []#Array{Float64}(undef, NDV+length(REL))
         for i = 1:NDV
             push!(R,sum(G[i,:])) # Derivative of Lagr. wrt. ith DV
