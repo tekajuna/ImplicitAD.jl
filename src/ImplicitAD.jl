@@ -27,7 +27,7 @@ include("eigenvalues.jl")
 export provide_rule
 include("external.jl")
 
-export Base.implicit_opt
+export implicit_opt
 include("diffopt.jl")
 
 
