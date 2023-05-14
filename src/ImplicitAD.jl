@@ -6,6 +6,11 @@ using ChainRulesCore
 using LinearAlgebra: factorize, ldiv!, diag
 
 
+<<<<<<< HEAD
+=======
+println("HITHERE! YOU ARE USING A LOCAL VERSION ON BRANCH  lagrange--it's awsome")
+# ---------------------------------------------------------------------------
+>>>>>>> e945a56 (updated implicit_opt with ReverseDiff chain rule)
 include("internals.jl")
 
 export implicit
