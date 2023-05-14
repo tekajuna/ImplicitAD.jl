@@ -1,3 +1,4 @@
+
 # ---------- differentiable optimization problems----------------
 implicit_opt(solve, objcon, P, opts, NDV ;method="Hessian") = solve(P, opts)
 
@@ -47,7 +48,6 @@ function implicit_opt(solve, objcon,P::AbstractVector{<:ForwardDiff.Dual{T}}, op
     end
     if method == "residual"
 
-        
         # Initally, all variables are relevant, and we have indices for each DV and LM
         relevant = BitSet(1:length(xLv))
 
@@ -124,9 +124,39 @@ function construct_residuals(REL,objcon,xLv,Pv,NDV)
             push!(R, objcon[REL[i]-NDV+1](vcat(xL[begin:NDV],P)))
         end
 
-        R = hcat(R...)
+        R = vcat(R...)
         return R
         
     end 
     return residual
 end
+
+function ChainRulesCore.rrule(::typeof(implicit_opt), solve, objcon,P,opts,NDV;method="residual")
+    xLv = copy(solve(P,opts)) # Get outputs of solve: DVs and Lags
+    Pv = ReverseDiff.value(P) # Value of input parameters stripped from dual
+    relevant = BitSet(1:length(xLv))
+    # Remove indices of any lagrange multiplier that is 
+    for i=NDV+1:length(xLv)
+        if xLv[i] <1e-5
+            delete!(relevant,i)
+        end
+    end
+    relevant = collect(relevant)
+    
+    # reconstruct output vector xLv to include only relevant pieces
+    xLvR = xLv[relevant] # Only relevant multipliers and values
+    residual = construct_residuals(relevant,objcon,xLv,Pv,NDV)
+    function pullback(ybar)
+        #Construct residuals
+        A = drdy_forward(residual, xLvR,P,opts)
+        u = linear_solve(A',ybar)
+        xbar = vjp(residual,xLvR,P,opts,-u)
+        return NoTangent(), NoTangent(),NoTangent(), xbar, NoTangent(), NoTangent()
+    end
+
+    return xLvR, pullback
+end
+
+ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::TrackedArray, opts,NDV;method="residual")
+ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::AbstractVector{<:TrackedReal}, opts,NDV;method="residual")
+

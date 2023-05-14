@@ -3,7 +3,7 @@ Compute Jacobian vector product b = -B*xdot where B_ij = ∂r_i/∂x_j
 This takes in the dual directly for x = (xv, xdot) since it is already formed that way.
 """
 function jvp(residual, y, xd, p)
-
+    
     # evaluate residual function
     rd = residual(y, xd, p)  # constant y
 

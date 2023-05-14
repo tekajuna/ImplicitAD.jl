@@ -8,7 +8,7 @@ using LinearAlgebra: factorize, ldiv!, diag
 # main function
 export implicit, explicit_unsteady, implicit_unsteady, implicit_opt,  implicit_linear, apply_factorization, implicit_eigval, provide_rule
 
-println("HITHERE! YOU ARE USING A LOCAL VERSION ON BRANCH  lagrange")
+println("HITHERE! YOU ARE USING A LOCAL VERSION ON BRANCH  lagrange--it's awsome")
 # ---------------------------------------------------------------------------
 include("internals.jl")
 
