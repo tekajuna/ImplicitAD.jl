@@ -31,7 +31,7 @@ include("external.jl")
 <<<<<<< HEAD
 =======
 export implicit_opt
-include("diffopt.jl")
+include("lagrangian.jl")
 
 >>>>>>> 7e609d5 (Correction to file)
 
