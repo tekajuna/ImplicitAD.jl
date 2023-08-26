@@ -28,7 +28,7 @@ export provide_rule
 include("external.jl")
 
 export implicit_opt
-include("diffopt.jl")
+include("lagrangian.jl")
 
 
 end
