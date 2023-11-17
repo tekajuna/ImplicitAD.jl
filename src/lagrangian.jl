@@ -11,6 +11,7 @@ Make implicit function AD compatible (specifically with ForwardDiff and ReverseD
 - `P::vector{float}`: evaluation point; constant parameters given to the optimization problem
 - `opts::tuple`: optional fixed parameters to solve. default is empty tuple. 
 - `NDV::int`: number of design variables, to distinguish output state from intermediate lagrange multipliers
+- `method::strong`: multiple methods are under development for the calculation of i/o derivatives. Options include {Hessian, residual}
 """
 
 function implicit_opt(solve, objcon,P::AbstractVector{<:ForwardDiff.Dual{T}}, opts,NDV; method="Hessian") where {T}
@@ -242,6 +243,7 @@ function construct_residuals(REL,objcon,NDV)
     return residual
 end
 
+# ReverseDiff (Not likely to be used as a good GP problem will involve few inputs and many outputs)
 function ChainRulesCore.rrule(::typeof(implicit_opt), solve, objcon,P,opts,NDV;method="residual")
     xLv = copy(solve(P,opts)) # Get outputs of solve: DVs and Lags
     Pv = ReverseDiff.value(P) # Value of input parameters stripped from dual
