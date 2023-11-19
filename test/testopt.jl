@@ -1,5 +1,7 @@
 using ImplicitAD
-using JuMP, Ipopt
+using PyCall
+using SNOW
+using Snopt
 
 m = Model(Ipopt.Optimizer)
 @variable(m,x )
