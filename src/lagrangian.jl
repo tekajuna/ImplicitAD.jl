@@ -275,6 +275,6 @@ function ChainRulesCore.rrule(::typeof(implicit_opt), solve, objcon,P,opts,NDV;m
     return xLvR, pullback
 end
 
-ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::TrackedArray, opts,NDV;method="residual")
-ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::AbstractVector{<:TrackedReal}, opts,NDV;method="residual")
+ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::ReverseDiff.TrackedArray, opts,NDV;method="residual")
+ReverseDiff.@grad_from_chainrules implicit_opt(solve, objcon, P::AbstractVector{<:ReverseDiff.TrackedReal}, opts,NDV;method="residual")
 
