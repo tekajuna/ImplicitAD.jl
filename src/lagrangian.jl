@@ -209,34 +209,39 @@ function construct_residuals2(REL,objcon,NDV)
     return residual
 end
 function construct_residuals(REL,objcon,NDV)
-    # M = length(xLv)
-    # N = length(Pv)
-
-    
     function residual(xL,P,opts)
-        G =[]
-
-        push!(G,ForwardDiff.gradient(objcon[1],vcat(xL[begin:NDV],P)))
-        # @show NDV, size(objcon),size(P),size(REL),size(xL)
-        # @show REL xL 
+        # G =[]#type #change to preallocation, assign by index instead of push!
+        G = Vector{Vector{ForwardDiff.Dual}}(undef,length(REL)-NDV +1)
+        # push!(G,ForwardDiff.gradient(objcon[1],vcat(xL[begin:NDV],P))) 
+        G[1] = ForwardDiff.gradient(objcon[1],vcat(xL[begin:NDV],P))
+        # println("to,et1 ",typeof(G),eltype(G))
         for i = NDV+1:length(REL)
-            # 9/21 changed first xL to xLv, should grab LagMult from full list using REL[i]
-            # However, doing this causes the Problem1 to break. . . actually gets a matrix singularity
-            push!(G,xL[REL[i]]*ForwardDiff.gradient(objcon[REL[i]-NDV+1],vcat(xL[begin:NDV],P)))
+            # push!(G,xL[REL[i]]*ForwardDiff.gradient(objcon[REL[i]-NDV+1],vcat(xL[begin:NDV],P)))
+            G[i-NDV+1] = xL[REL[i]]*ForwardDiff.gradient(objcon[REL[i]-NDV+1],vcat(xL[begin:NDV],P))
         end
-        
+        # println("to,et2 ",typeof(G),eltype(G))
         G = hcat(G...) # All the gradients 
+        # println("to,et3 ",typeof(G),eltype(G))
+        # println("typeo G: ", typeof(G[1]))
+        # println("Val G ", G[1])
         
-        R = []#Array{Float64}(undef, NDV+length(REL))
+        # R = []#Array{Float64}(undef, NDV+length(REL))
+        R = Vector{ForwardDiff.Dual}(undef,length(REL))
         for i = 1:NDV
-            push!(R,sum(G[i,:])) # Derivative of Lagr. wrt. ith DV
+            # push!(R,sum(G[i,:])) # Derivative of Lagr. wrt. ith DV
+            R[i] = sum(G[i,:])
         end
 
         for i = NDV+1:length(REL)
-            push!(R, objcon[REL[i]-NDV+1](vcat(xL[begin:NDV],P)))
+            # push!(R, objcon[REL[i]-NDV+1](vcat(xL[begin:NDV],P)))
+            R[i] =objcon[REL[i]-NDV+1](vcat(xL[begin:NDV],P))
         end
+        # println("typeo R1: ", typeof(R))
+        # println("Val R1 ", R[1],typeof(R[1]))
 
         R = vcat(R...)
+        # println("typeo R2: ", typeof(R))
+        # println("Val R2 ", R[1],typeof(R[1]))
         return R
         
     end 
