@@ -6,6 +6,19 @@ using ChainRulesCore
 using LinearAlgebra: factorize, ldiv!, diag
 
 
+using LinearAlgebra: factorize, ldiv!, diag, cond, svd, dot, Diagonal,I #Adds cond,svd for analysis of linear solves
+using BlockDiagonals
+
+# For differentiable optimization
+using SparseArrays
+using SparseDiffTools
+using LinearOperators
+using IterativeSolvers
+# main function
+export implicit, explicit_unsteady, implicit_unsteady, implicit_opt,  implicit_linear, apply_factorization, implicit_eigval, provide_rule
+
+println("HITHERE! YOU ARE USING A LOCAL VERSION ON BRANCH  diffopt")
+# ---------------------------------------------------------------------------
 include("internals.jl")
 
 export implicit
@@ -23,8 +36,8 @@ include("eigenvalues.jl")
 export provide_rule, derivativesetup
 include("external.jl")
 
-export implicit_opt
-include("lagrangian.jl")
+export implicit_kkt, implicit_opt
+include("kkt.jl")
 
 
 end
